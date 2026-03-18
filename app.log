@@ -1,6 +1,10 @@
-INFO Application started
-INFO User login successful
-WARNING Disk space running low
-ERROR Database connection failed
-INFO Retrying connection
-ERROR Timeout occurred
+2024-01-01 10:00:01 INFO Application started
+2024-01-01 10:01:15 INFO Connected to database
+2024-01-01 10:05:32 WARNING High memory usage detected
+2024-01-01 10:07:44 ERROR Failed to process request
+2024-01-01 10:08:01 INFO Retrying request
+2024-01-01 10:09:55 WARNING Slow response time
+2024-01-01 10:11:23 ERROR Timeout on connection
+2024-01-01 10:12:00 INFO Request completed
+2024-01-01 10:13:45 ERROR Database connection lost
+2024-01-01 10:14:00 INFO Reconnecting...

@@ -1,41 +1,69 @@
 pipeline {
     agent {
-        docker { image 'python:3.11-slim' }
+        docker { 
+            image 'python:3.11-slim'
+            args '--pull never'
+        }
+    }
+
+    triggers {
+        pollSCM('H/5 * * * *')
+    }
+
+    environment {
+        APP_VERSION = '1.0.0'
+        REPORT_FILE = 'report.txt'
     }
 
     stages {
-
-        stage('Checkout Repo') {
+        stage('Checkout') {
             steps {
-                echo 'Checking out repository...'
+                echo "Log Analyzer version ${env.APP_VERSION}"
                 checkout scm
             }
         }
 
-        stage('Setup Python Environment') {
+        stage('Setup') {
             steps {
-                echo 'Installing dependencies...'
-                sh 'pip install --upgrade pip -q'
+                echo 'Installing pytest...'
+                sh 'pip install pytest -q'
             }
         }
 
-        stage('Run Python Script') {
+        stage('Test') {
             steps {
-                echo 'Running log analyzer...'
+                echo 'Running tests...'
+                sh 'python -m pytest test_log_analyzer.py -v'
+            }
+        }
+
+        stage('Run') {
+            steps {
+                echo 'Analyzing logs...'
                 sh 'python log_analyzer.py'
+            }
+        }
+
+        stage('Archive Report') {
+            steps {
+                echo 'Saving report as artifact...'
+                // 👇 This is the artifact magic
+                archiveArtifacts artifacts: 'report.txt', 
+                                 fingerprint: true,
+                                 onlyIfSuccessful: true
             }
         }
     }
 
     post {
         success { 
-            echo 'Pipeline completed successfully! ✅' 
+            echo '✅ Log analysis complete! Download report.txt from the build page.'
         }
         failure { 
-            echo 'Pipeline failed. Check the logs. ❌' 
+            echo '❌ Pipeline failed. Check the logs.' 
         }
-        always {
-            cleanWs()
+        always { 
+            cleanWs() 
         }
     }
 }
